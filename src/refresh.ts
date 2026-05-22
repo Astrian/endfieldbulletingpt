@@ -1,6 +1,16 @@
 import func from "./func/index.ts"
 
-export async function refresh(env: Pick<Env, "DB" | "EF_MIMO_API_KEY">) {
+export async function refresh(
+	env: Pick<
+		Env,
+		| "DB"
+		| "EF_CONTACT"
+		| "EF_MIMO_API_KEY"
+		| "EF_TELEGRAM_BOT_TOKEN"
+		| "EF_TELEGRAM_CHAT_ID"
+		| "EF_TELEGRAPH_TOKEN"
+	>,
+) {
 	console.log("debug")
 
 	// 获取终末地公告 API 内容
@@ -10,8 +20,7 @@ export async function refresh(env: Pick<Env, "DB" | "EF_MIMO_API_KEY">) {
 	const announcements_list = (await response.json()) as EndfieldBulletinResponse
 
 	// 遍历公告内容
-	// announcements_list.data.list.forEach(async (announcement: EndfieldBulletinListItem) => {
-	const announcement = announcements_list.data.list[0]
-	await func.processAnnouncement(announcement, env)
-	//})
+	for (const announcement of announcements_list.data.list) {
+		await func.processAnnouncement(announcement, env)
+	}
 }

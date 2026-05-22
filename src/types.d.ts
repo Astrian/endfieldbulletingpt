@@ -1,6 +1,10 @@
 declare global {
 	interface Env {
 		EF_MIMO_API_KEY: string
+		EF_TELEGRAM_BOT_TOKEN: string
+		EF_TELEGRAM_CHAT_ID: string
+		EF_TELEGRAPH_TOKEN: string
+		EF_CONTACT: string
 		DB: D1Database
 	}
 
@@ -94,6 +98,22 @@ declare global {
 		end_time?: Date
 		detail: string
 	}
+
+	type StoredGameEvent = {
+		id: string
+		name: string
+		start_time: number
+		end_time: number
+		detail: string
+	}
+
+	type TelegraphNode = {
+		tag: string
+		attrs?: Record<string, string>
+		children?: TelegraphContent[]
+	}
+
+	type TelegraphContent = TelegraphNode | string
 }
 
 export {}

@@ -10,7 +10,7 @@
 		"preinstall": "npx only-allow pnpm",
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy",
-		"debug:refresh": "node --env-file-if-exists=.dev.vars --experimental-strip-types src/debug-refresh.mts",
+		"debug:refresh": "node --experimental-strip-types src/debug-refresh.mts",
 		"cf-typegen": "wrangler types",
 		"format": "biome format --write .",
 		"check": "biome check .",
@@ -38,7 +38,7 @@
 		"wrangler": "^4.93.0"
 	},
 	"dependencies": {
-		"@toon-format/toon": "^2.3.0",
+		"node-html-parser": "^7.1.0",
 		"openai": "^6.38.0"
 	}
 }

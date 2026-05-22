@@ -1,7 +1,17 @@
-// Import modules
-
-import { decode } from "@toon-format/toon"
 import OpenAI from "openai"
+
+type LlmAnalysisJson = {
+	events: LlmAnalysisEvent[]
+	maintance: LlmAnalysisEvent[]
+	summary: string
+}
+
+type LlmAnalysisEvent = {
+	name: string
+	start_time: string
+	end_time: string
+	detail: string
+}
 
 export default async function (
 	content: string,
@@ -37,23 +47,33 @@ export default async function (
 - 如果公告中只有一张图片，events 和 maintance 请返回空数组，summary 请返回空字符串
 - 如果侦测到某个活动或维护详情不包含精确的开始时间和结束时间，忽略这一条目
 
-使用以下 TOON 模板输出：
+严格输出 JSON，除 JSON 外不要输出任何解释文字、Markdown 代码块或注释。JSON 结构如下：
 
-events[]{name,start_time,end_time,detail}:
-  「相见欢」复刻活动,2026-01-26T16:00,2026-02-09T03:59,活动详情...
-maintance[]{name,start_time,end_time,detail}:
-  闪断更新,2026-01-26T16:00,2026-01-26T16:10,维护详情...
-summary: 公告总结
+{
+  "events": [
+    {
+      "name": "「相见欢」复刻活动",
+      "start_time": "2026-01-26T16:00",
+      "end_time": "2026-02-09T03:59",
+      "detail": "活动详情..."
+    }
+  ],
+  "maintance": [
+    {
+      "name": "闪断更新",
+      "start_time": "2026-01-26T16:00",
+      "end_time": "2026-01-26T16:10",
+      "detail": "维护详情..."
+    }
+  ],
+  "summary": "公告总结"
+}
 
-如果 events 或 maintance 数组为空，请按 TOON 标准空数组写法：
+如果 events 或 maintance 为空，请输出空数组 []。如果没有总结，请输出空字符串 ""。
 
-events: []
-maintance: []
-summary: 公告总结
-
-请勿在中括号 count 部分填入活动或维护事项的具体数量（即请留空中括号）。详情、总结中涉及数量的星号请转换为 × 符号。
+详情、总结中涉及数量的星号请转换为 × 符号。
 	`
-	var result: {
+	const result: {
 		events: GameEvent[]
 		maintance: GameEvent[]
 		summary: string
@@ -86,54 +106,79 @@ summary: 公告总结
 
 		console.log("===")
 
-		// Parse
-		const parseRes = decode(msg.choices[0].message.content || "") as unknown as {
-			events: {
-				name: string
-				start_time: string
-				end_time: string
-				detail: string
-			}[]
-			maintance: GameEvent[]
-			summary: string
-		}
+		const parseRes = parseLlmAnalysisJson(msg.choices[0].message.content || "")
 		console.log(parseRes)
-		for (const i in parseRes.events) {
-			const event = parseRes.events[i]
-			// 2024-05-08T01:01:40+08:00
-			const start_time_string = `${event.start_time}:00+08:00`
-			console.log(`start_time_string: ${start_time_string}`)
-			const start_time = new Date(start_time_string)
-			const end_time_string = `${event.end_time}:00+08:00`
-			console.log(`end_time_string: ${end_time_string}`)
-			const end_time = new Date(end_time_string)
-			result.events.push({
-				name: event.name,
-				start_time: start_time,
-				end_time: end_time,
-				detail: event.detail,
-			})
+
+		for (const event of parseRes.events) {
+			result.events.push(toGameEvent(event))
 		}
-		for (const i in parseRes.maintance) {
-			const event = parseRes.maintance[i]
-			// 2024-05-08T01:01:40Z
-			const start_time_string = `${event.start_time}:00+08:00`
-			console.log(`start_time_string: ${start_time_string}`)
-			const start_time = new Date(start_time_string)
-			const end_time_string = `${event.end_time}:00+08:00`
-			console.log(`end_time_string: ${end_time_string}`)
-			const end_time = new Date(end_time_string)
-			result.maintance.push({
-				name: event.name,
-				start_time: start_time,
-				end_time: end_time,
-				detail: event.detail,
-			})
+
+		for (const event of parseRes.maintance) {
+			result.maintance.push(toGameEvent(event))
 		}
+
 		result.summary = parseRes.summary
 	} catch (error) {
 		console.log("error")
 		console.log(error)
 	}
 	return result
+}
+
+function parseLlmAnalysisJson(content: string): LlmAnalysisJson {
+	const json = extractJson(content)
+	const parsed = JSON.parse(json) as Partial<LlmAnalysisJson>
+
+	return {
+		events: normalizeEvents(parsed.events),
+		maintance: normalizeEvents(parsed.maintance),
+		summary: typeof parsed.summary === "string" ? parsed.summary : "",
+	}
+}
+
+function extractJson(content: string): string {
+	const trimmed = content.trim()
+	const fencedMatch = /^```(?:json)?\s*([\s\S]*?)\s*```$/.exec(trimmed)
+	if (fencedMatch) {
+		return fencedMatch[1]
+	}
+
+	return trimmed
+}
+
+function normalizeEvents(events: unknown): LlmAnalysisEvent[] {
+	if (!Array.isArray(events)) {
+		return []
+	}
+
+	return events.filter(isLlmAnalysisEvent)
+}
+
+function isLlmAnalysisEvent(event: unknown): event is LlmAnalysisEvent {
+	if (!event || typeof event !== "object") {
+		return false
+	}
+
+	const candidate = event as Partial<Record<keyof LlmAnalysisEvent, unknown>>
+	return (
+		typeof candidate.name === "string" &&
+		typeof candidate.start_time === "string" &&
+		typeof candidate.end_time === "string" &&
+		typeof candidate.detail === "string"
+	)
+}
+
+function toGameEvent(event: LlmAnalysisEvent): GameEvent {
+	const startTimeString = `${event.start_time}:00+08:00`
+	const endTimeString = `${event.end_time}:00+08:00`
+
+	console.log(`start_time_string: ${startTimeString}`)
+	console.log(`end_time_string: ${endTimeString}`)
+
+	return {
+		name: event.name,
+		start_time: new Date(startTimeString),
+		end_time: new Date(endTimeString),
+		detail: event.detail,
+	}
 }
