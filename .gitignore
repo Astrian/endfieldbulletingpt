@@ -22,3 +22,7 @@
 !src/**/*.ts
 !src/**/*.mts
 !src/**/*.d.ts
+
+!.github
+!.github/workflows
+!.github/workflows/*.yml
