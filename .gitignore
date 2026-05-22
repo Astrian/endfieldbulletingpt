@@ -1,0 +1,17 @@
+*
+
+!.gitignore
+!package.json
+!pnpm-workspace.yaml
+!pnpm-lock.yaml
+!biome.json
+!tsconfig.json
+!wrangler.jsonc
+!worker-configuration.d.ts
+
+!.githooks/
+!.githooks/pre-commit
+
+!src/
+!src/**/
+!src/**/*.ts

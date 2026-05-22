@@ -1,0 +1,38 @@
+{
+	"name": "endfieldbulletingpt",
+	"version": "1.0.0",
+	"description": "",
+	"main": "src/app.ts",
+	"packageManager": "pnpm@11.0.8",
+	"scripts": {
+		"prepare": "git config core.hooksPath .githooks",
+		"preinstall": "npx only-allow pnpm",
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"cf-typegen": "wrangler types",
+		"format": "biome format --write .",
+		"check": "biome check .",
+		"typecheck": "tsc --noEmit",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"lint-staged": {
+		"*.{js,jsx,ts,tsx,json,jsonc,css,graphql,md,yml,yaml}": "biome format --write --no-errors-on-unmatched"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Astrian/endfieldbulletingpt.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Astrian/endfieldbulletingpt/issues"
+	},
+	"homepage": "https://github.com/Astrian/endfieldbulletingpt#readme",
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.15",
+		"lint-staged": "^17.0.5",
+		"typescript": "^6.0.3",
+		"wrangler": "^4.93.0"
+	}
+}
