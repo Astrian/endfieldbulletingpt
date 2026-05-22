@@ -1,9 +1,7 @@
-type Env = Record<string, never>
+import { refresh } from "./refresh.ts"
 
 export default {
-	async scheduled(_event, _env, _ctx) {
-		refresh()
+	scheduled(_event, env, ctx) {
+		ctx.waitUntil(refresh(env))
 	},
 } satisfies ExportedHandler<Env>
-
-async function refresh() {}

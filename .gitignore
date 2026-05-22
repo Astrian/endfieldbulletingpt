@@ -8,10 +8,17 @@
 !tsconfig.json
 !wrangler.jsonc
 !worker-configuration.d.ts
+!.dev.vars.example
 
 !.githooks/
 !.githooks/pre-commit
 
+!migrations/
+!migrations/**/
+!migrations/**/*.sql
+
 !src/
 !src/**/
 !src/**/*.ts
+!src/**/*.mts
+!src/**/*.d.ts

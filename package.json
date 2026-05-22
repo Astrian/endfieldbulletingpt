@@ -2,6 +2,7 @@
 	"name": "endfieldbulletingpt",
 	"version": "1.0.0",
 	"description": "",
+	"type": "module",
 	"main": "src/app.ts",
 	"packageManager": "pnpm@11.0.8",
 	"scripts": {
@@ -9,6 +10,7 @@
 		"preinstall": "npx only-allow pnpm",
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy",
+		"debug:refresh": "node --env-file-if-exists=.dev.vars --experimental-strip-types src/debug-refresh.mts",
 		"cf-typegen": "wrangler types",
 		"format": "biome format --write .",
 		"check": "biome check .",
@@ -34,5 +36,9 @@
 		"lint-staged": "^17.0.5",
 		"typescript": "^6.0.3",
 		"wrangler": "^4.93.0"
+	},
+	"dependencies": {
+		"@toon-format/toon": "^2.3.0",
+		"openai": "^6.38.0"
 	}
 }

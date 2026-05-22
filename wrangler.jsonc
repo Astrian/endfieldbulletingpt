@@ -4,6 +4,14 @@
 	"main": "src/app.ts",
 	"compatibility_date": "2026-05-22",
 	"workers_dev": false,
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "endfieldbulletingpt",
+			"database_id": "f6eeaead-7261-4418-b7ca-26271ad29c4a",
+			"migrations_dir": "migrations"
+		}
+	],
 	"triggers": {
 		"crons": ["* * * * *"]
 	}
