@@ -89,7 +89,7 @@ export default async function (
 			apiKey: env.EF_MIMO_API_KEY,
 		})
 		const msg = await openai.chat.completions.create({
-			model: "mimo-v2.5",
+			model: "mimo-v2.6-flash",
 			temperature: 0.3,
 			messages: [
 				{
